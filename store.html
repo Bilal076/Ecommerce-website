@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ai's Store - E-commerce</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff;
+            color: #333;
+        }
+
+        header {
+            background-color: #005bb5;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        nav a {
+            color: white;
+            margin: 0 1rem;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        nav a:hover {
+            color: #ff9900;
+        }
+
+        .section {
+            padding: 2rem;
+            text-align: center;
+        }
+
+        footer {
+            background-color: #005bb5;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            margin-top: 2rem;
+        }
+
+        button {
+            background-color: #ff9900;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        button:hover {
+            background-color: #e68a00;
+        }
+
+        .products {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            padding: 2rem;
+        }
+
+        .product-card {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 1rem;
+            background-color: #ffffff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+
+        .product-card h3 {
+            margin: 0.5rem 0;
+        }
+
+        .product-card p {
+            color: #0073e6;
+            font-weight: bold;
+        }
+
+        #cart-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        #cart-modal .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 5px;
+            width: 80%;
+            max-width: 500px;
+        }
+
+        #cart-modal button {
+            margin-top: 1rem;
+            background-color: #ff9900;
+        }
+
+        #contact-form input, #contact-form textarea {
+            width: 100%;
+            padding: 0.8rem;
+            margin: 0.5rem 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        #contact-form button {
+            background-color: #ff9900;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        #contact-form button:hover {
+            background-color: #e68a00;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="javascript:void(0)" onclick="showSection('about')">Home</a>
+            <a href="javascript:void(0)" onclick="showSection('products')">Shop</a>
+            <a href="javascript:void(0)" onclick="showSection('cart')">Cart</a>
+            <a href="javascript:void(0)" onclick="showSection('contact')">Contact</a>
+        </nav>
+    </header>
+
+    <div id="about" class="section">
+        <h1>Welcome to Ai's Store</h1>
+        <p>We believe in sustainable living. Our mission is to provide eco-friendly products that support a healthier planet and a brighter future for all. Join us in making a difference, one purchase at a time.</p>
+    </div>
+
+    <div id="products" class="section" style="display: none;">
+        <h2>Our Products</h2>
+        <div class="products" id="products-container"></div>
+    </div>
+
+    <div id="cart" class="section" style="display: none;">
+        <h2>Your Cart</h2>
+        <div id="cart-items">Your cart is empty.</div>
+        <button onclick="checkout()">Checkout</button>
+    </div>
+
+    <div id="contact" class="section" style="display: none;">
+        <h2>Contact Us</h2>
+        <form id="contact-form">
+            <input type="text" placeholder="Your Name" required>
+            <input type="email" placeholder="Your Email" required>
+            <textarea placeholder="Your Message" rows="5" required></textarea>
+            <button type="submit">Send Message</button>
+        </form>
+    </div>
+
+    <div id="cart-modal">
+        <div class="modal-content">
+            <h2>Your Cart</h2>
+            <div id="modal-cart-items">Your cart is empty.</div>
+            <button onclick="closeCartModal()">Close</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Ai's Store | All Rights Reserved</p>
+    </footer>
+
+    <script>
+        const products = [
+    {name: "Biodegradable Straw", price: "$5.99", image: "https://via.placeholder.com/200", description: "Made from natural materials, perfect for eco-friendly living."},
+    {name: "Reusable Water Bottle", price: "$12.99", image: "https://via.placeholder.com/200", description: "Keep your drinks cool or warm with this reusable bottle."},
+    {name: "Eco-friendly Lunchbox", price: "$9.99", image: "https://via.placeholder.com/200", description: "A sustainable lunchbox that helps reduce plastic waste."},
+    {name: "Compostable Phone Case", price: "$15.99", image: "https://via.placeholder.com/200", description: "A phone case made from plant-based materials that decompose over time."},
+    {name: "Bamboo Toothbrush", price: "$3.99", image: "https://via.placeholder.com/200", description: "A bamboo toothbrush to reduce plastic usage in your daily routine."},
+    {name: "Organic Cotton Tote Bag", price: "$7.99", image: "https://via.placeholder.com/200", description: "A reusable cotton tote bag perfect for groceries or daily use."},
+    {name: "Eco-friendly Shampoo Bar", price: "$8.99", image: "https://via.placeholder.com/200", description: "A solid shampoo bar made from organic ingredients to minimize plastic waste."},
+    {name: "Recycled Paper Notebook", price: "$4.99", image: "https://via.placeholder.com/200", description: "A notebook made from 100% recycled paper for all your writing needs."},
+    {name: "Reusable Coffee Cup", price: "$10.99", image: "https://via.placeholder.com/200", description: "A stainless steel coffee cup to help reduce disposable cup waste."},
+    {name: "Solar-Powered Charger", price: "$19.99", image: "https://via.placeholder.com/200", description: "A solar-powered charger for your devices, ideal for outdoor use."},
+    {name: "Bamboo Cutlery Set", price: "$6.99", image: "https://via.placeholder.com/200", description: "A set of bamboo cutlery to replace plastic alternatives."},
+    {name: "Reusable Face Mask", price: "$4.49", image: "https://via.placeholder.com/200", description: "A washable and reusable cloth face mask for everyday protection."},
+    {name: "Eco-friendly Yoga Mat", price: "$22.99", image: "https://via.placeholder.com/200", description: "A non-toxic, sustainable yoga mat made from natural rubber."},
+    {name: "Plant-Based Detergent", price: "$12.49", image: "https://via.placeholder.com/200", description: "A natural, plant-based detergent that’s safe for the environment."},
+    {name: "Sustainable Sneakers", price: "$49.99", image: "https://via.placeholder.com/200", description: "Eco-friendly sneakers made from recycled materials."},
+    {name: "Zero-Waste Toothpaste", price: "$6.99", image: "https://via.placeholder.com/200", description: "A toothpaste in a recyclable container, promoting a zero-waste lifestyle."},
+    {name: "Eco-Friendly Candles", price: "$11.99", image: "https://via.placeholder.com/200", description: "Candles made from soy wax and essential oils in reusable containers."},
+    {name: "Recycled Glass Water Bottle", price: "$13.99", image: "https://via.placeholder.com/200", description: "A stylish water bottle made from recycled glass."},
+    {name: "Bamboo Charcoal Air Purifier", price: "$18.99", image: "https://via.placeholder.com/200", description: "An all-natural air purifier made from bamboo charcoal."},
+    {name: "Sustainable Backpack", price: "$29.99", image: "https://via.placeholder.com/200", description: "A backpack made from recycled plastic bottles for a sustainable lifestyle."},
+    {name: "Compostable Plates", price: "$10.99", image: "https://via.placeholder.com/200", description: "Plates made from bamboo or palm leaves, perfect for eco-friendly gatherings."},
+    {name: "Organic Cotton Bedding Set", price: "$39.99", image: "https://via.placeholder.com/200", description: "A bedding set made from 100% organic cotton, soft and sustainable."},
+    {name: "Eco-Friendly Paint", price: "$15.99", image: "https://via.placeholder.com/200", description: "A low-VOC, eco-friendly paint option for your home renovation."},
+    {name: "Biodegradable Dog Waste Bags", price: "$7.99", image: "https://via.placeholder.com/200", description: "Pet waste bags made from plant-based materials that break down naturally."},
+    {name: "Bamboo Bath Towel", price: "$21.99", image: "https://via.placeholder.com/200", description: "A soft and luxurious bath towel made from eco-friendly bamboo fibers."},
+    {name: "Wooden Sunglasses", price: "$25.99", image: "https://via.placeholder.com/200", description: "Stylish sunglasses made from sustainable wood and recycled materials."},
+    {name: "Plastic-Free Deodorant", price: "$8.99", image: "https://via.placeholder.com/200", description: "An aluminum-free and plastic-free deodorant made with natural ingredients."},
+    {name: "Eco-Friendly Laundry Detergent", price: "$14.99", image: "https://via.placeholder.com/200", description: "A natural, eco-friendly laundry detergent in biodegradable packaging."},
+    {name: "Upcycled Leather Wallet", price: "$24.99", image: "https://via.placeholder.com/200", description: "A sleek wallet made from upcycled leather and sustainable materials."},
+    {name: "Sustainable Bamboo Desk Organizer", price: "$13.99", image: "https://via.placeholder.com/200", description: "A bamboo desk organizer that helps you stay organized and eco-conscious."},
+    {name: "Biodegradable Glitter", price: "$5.49", image: "https://via.placeholder.com/200", description: "A non-toxic, biodegradable glitter for eco-friendly crafting."},
+    {name: "Reusable Snack Bags", price: "$7.99", image: "https://via.placeholder.com/200", description: "A set of reusable snack bags made from durable fabric."},
+    {name: "Recycled Plastic Rugs", price: "$32.99", image: "https://via.placeholder.com/200", description: "Handwoven rugs made from 100% recycled plastic bottles."},
+    {name: "Organic Tea Bags", price: "$4.49", image: "https://via.placeholder.com/200", description: "A pack of organic, biodegradable tea bags for a sustainable brew."},
+    {name: "Wooden Toothbrush Stand", price: "$8.99", image: "https://via.placeholder.com/200", description: "A stylish and functional stand made from sustainable wood to hold your toothbrush."},
+    {name: "Sustainable Picnic Set", price: "$45.99", image: "https://via.placeholder.com/200", description: "A picnic set made from eco-friendly materials for your outdoor gatherings."},
+    {name: "Bamboo Hairbrush", price: "$10.49", image: "https://via.placeholder.com/200", description: "A bamboo hairbrush that’s gentle on your hair and the planet."},
+    {name: "Upcycled Denim Tote Bag", price: "$15.99", image: "https://via.placeholder.com/200", description: "A tote bag made from upcycled denim for a unique, sustainable look."}
+];
+
+
+        let cart = [];
+
+        window.onload = function() {
+            const productsContainer = document.getElementById("products-container");
+            products.forEach(product => {
+                const productCard = `
+                    <div class="product-card" onclick="viewProductDescription('${product.name}')">
+                        <img src="${product.image}" alt="${product.name}">
+                        <h3>${product.name}</h3>
+                        <p>${product.price}</p>
+                        <button onclick="event.stopPropagation(); addToCart('${product.name}')">Add to Cart</button>
+                    </div>
+                `;
+                productsContainer.innerHTML += productCard;
+            });
+        };
+
+        function showSection(sectionId) {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => section.style.display = 'none');
+            document.getElementById(sectionId).style.display = 'block';
+        }
+
+        function addToCart(productName) {
+            cart.push(productName);
+            updateCart();
+        }
+
+        function updateCart() {
+            localStorage.setItem('cart', JSON.stringify(cart));
+            const cartItems = document.getElementById("cart-items");
+            const modalCartItems = document.getElementById("modal-cart-items");
+
+            if (cart.length === 0) {
+                cartItems.innerHTML = "Your cart is empty.";
+                modalCartItems.innerHTML = "Your cart is empty.";
+            } else {
+                cartItems.innerHTML = cart.join(", ");
+                modalCartItems.innerHTML = cart.join(", ");
+            }
+        }
+
+        function viewProductDescription(productName) {
+            const product = products.find(p => p.name === productName);
+            alert(`${product.name}: ${product.description} - ${product.price}`);
+        }
+
+        function checkout() {
+            alert("Proceeding to checkout...");
+        }
+
+        function closeCartModal() {
+            document.getElementById("cart-modal").style.display = "none";
+        }
+
+        function openCartModal() {
+            document.getElementById("cart-modal").style.display = "flex";
+        }
+
+        document.querySelector('#cart').addEventListener('click', openCartModal);
+    </script>
+</body>
+</html>
